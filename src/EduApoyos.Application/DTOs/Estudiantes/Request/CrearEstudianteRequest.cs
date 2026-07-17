@@ -2,7 +2,7 @@
 {
     public class CrearEstudianteRequest
     {
-        public Guid UsuarioId { get; set; }
+        public Guid? UsuarioId { get; set; }
 
         public string NumeroDocumento { get; set; } = string.Empty;
 

@@ -36,4 +36,25 @@ public class EstudianteRepository : IEstudianteRepository
 
     public async Task AgregarAsync(Estudiante estudiante, CancellationToken ct = default) =>
         await _context.Estudiantes.AddAsync(estudiante, ct);
+
+
+    public async Task<List<Guid>> ObtenerTodosLosUsuarioIdsAsync(CancellationToken ct = default)
+    {
+
+        return await _context.Estudiantes
+       .Where(e => !e.UsuarioId.HasValue)
+       .Select(e => e.Id)
+       .ToListAsync(ct);
+
+        //return await _context.Estudiantes
+        //    .Where(e => e.UsuarioId!.HasValue)
+        //    .Select(e => e.UsuarioId!.Value)
+        //    .ToListAsync(ct);
+    }
+
+    public void Eliminar(Estudiante estudiante)
+    {
+        _context.Estudiantes.Remove(estudiante);
+    }
+
 }
