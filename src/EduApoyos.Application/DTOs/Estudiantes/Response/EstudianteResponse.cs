@@ -10,7 +10,7 @@ namespace EduApoyos.Application.DTOs.Estudiantes.Response
     {
         public Guid Id { get; set; }
 
-        public Guid UsuarioId { get; set; }
+        public Guid? UsuarioId { get; set; }
 
         public string NumeroDocumento { get; set; } = string.Empty;
 

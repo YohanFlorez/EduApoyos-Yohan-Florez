@@ -10,4 +10,8 @@ public interface IEstudianteRepository
     Task<Estudiante?> ObtenerPorNumeroDocumentoAsync(string numeroDocumento, CancellationToken ct = default);
     Task<PagedResult<Estudiante>> ListarAsync(int pageNumber, int pageSize, CancellationToken ct = default);
     Task AgregarAsync(Estudiante estudiante, CancellationToken ct = default);
+    Task<List<Guid>> ObtenerTodosLosUsuarioIdsAsync(CancellationToken ct = default);
+
+    void Eliminar(Estudiante estudiante);
+
 }

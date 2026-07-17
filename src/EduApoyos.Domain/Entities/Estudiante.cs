@@ -1,12 +1,12 @@
 namespace EduApoyos.Domain.Entities;
 
-/// 
-/// Datos académicos de un estudiante. 
-///
+/// <summary>
+/// Datos académicos de un estudiante.
+/// </summary>
 public class Estudiante
 {
     public Guid Id { get; private set; }
-    public Guid UsuarioId { get; private set; }
+    public Guid? UsuarioId { get; private set; }
     public string NumeroDocumento { get; private set; } = default!;
     public string TipoDocumento { get; private set; } = default!;
     public string ProgramaAcademico { get; private set; } = default!;
@@ -17,18 +17,21 @@ public class Estudiante
 
     protected Estudiante()
     {
-       
     }
 
-    public Estudiante(Guid usuarioId, string numeroDocumento, string tipoDocumento,
-        string programaAcademico, int semestre)
+    public Estudiante(string numeroDocumento, string tipoDocumento,
+        string programaAcademico, int semestre, Guid? usuarioId = null)
     {
-        if (usuarioId == Guid.Empty)
-            throw new Domain.Common.DomainException("El estudiante debe estar asociado a un usuario válido.");
         if (string.IsNullOrWhiteSpace(numeroDocumento))
             throw new Domain.Common.DomainException("El número de documento es obligatorio.");
+        if (string.IsNullOrWhiteSpace(tipoDocumento))
+            throw new Domain.Common.DomainException("El tipo de documento es obligatorio.");
+        if (string.IsNullOrWhiteSpace(programaAcademico))
+            throw new Domain.Common.DomainException("El programa académico es obligatorio.");
         if (semestre <= 0)
             throw new Domain.Common.DomainException("El semestre debe ser mayor a cero.");
+        if (usuarioId.HasValue && usuarioId.Value == Guid.Empty)
+            throw new Domain.Common.DomainException("El usuarioId, si se especifica, debe ser válido.");
 
         Id = Guid.NewGuid();
         UsuarioId = usuarioId;
@@ -40,10 +43,34 @@ public class Estudiante
 
     public void ActualizarDatos(string programaAcademico, int semestre)
     {
+        if (string.IsNullOrWhiteSpace(programaAcademico))
+            throw new Domain.Common.DomainException("El programa académico es obligatorio.");
         if (semestre <= 0)
             throw new Domain.Common.DomainException("El semestre debe ser mayor a cero.");
 
         ProgramaAcademico = programaAcademico;
         Semestre = semestre;
     }
+
+    // Vincula la cuenta de usuario cuando el estudiante se registra en el portal.
+    // Solo se puede hacer una vez.
+    public void VincularUsuario(Guid usuarioId)
+    {
+        if (usuarioId == Guid.Empty)
+            throw new Domain.Common.DomainException("El usuarioId debe ser válido.");
+        if (UsuarioId.HasValue)
+            throw new Domain.Common.DomainException("El estudiante ya tiene una cuenta de usuario vinculada.");
+
+        UsuarioId = usuarioId;
+    }
+    public void ActualizarDatosAcademicos(
+    string tipoDocumento, string numeroDocumento, string programaAcademico, int semestre)
+    {
+        TipoDocumento = tipoDocumento;
+        NumeroDocumento = numeroDocumento;
+        ProgramaAcademico = programaAcademico;
+        Semestre = semestre;
+    }
+
+    public bool TieneCuentaActiva => UsuarioId.HasValue;
 }

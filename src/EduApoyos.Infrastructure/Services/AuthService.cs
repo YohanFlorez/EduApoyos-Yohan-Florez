@@ -50,11 +50,11 @@ public class AuthService : IAuthService
         if (request.Rol == RolUsuario.Estudiante)
         {
             var estudiante = new Estudiante(
-                usuario.Id,
-                request.NumeroDocumento!,
-                request.TipoDocumento!,
-                request.ProgramaAcademico!,
-                request.Semestre!.Value);
+             request.NumeroDocumento!,
+             request.TipoDocumento!,
+             request.ProgramaAcademico!,
+             request.Semestre!.Value,
+             usuario.Id);
 
             await _unitOfWork.Estudiantes.AgregarAsync(estudiante, ct);
             await _unitOfWork.GuardarCambiosAsync(ct);
