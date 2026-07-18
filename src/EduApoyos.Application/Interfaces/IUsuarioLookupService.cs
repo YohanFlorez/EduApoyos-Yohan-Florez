@@ -16,5 +16,8 @@ namespace EduApoyos.Application.Interfaces
          RolUsuario rol,
          IEnumerable<Guid> idsExcluidos,
          CancellationToken ct = default);
+
+        Task<Dictionary<Guid, string>> ObtenerNombresPorUsuarioIdsAsync(
+            IEnumerable<Guid> usuarioIds, CancellationToken ct);
     }
 }

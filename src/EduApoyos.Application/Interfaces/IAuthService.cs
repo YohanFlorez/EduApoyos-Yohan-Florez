@@ -1,5 +1,7 @@
 ﻿using EduApoyos.Application.DTOs.Auth.Request;
 using EduApoyos.Application.DTOs.Auth.Response;
+using EduApoyos.Application.DTOs.Usuarios.Request;
+using EduApoyos.Application.DTOs.Usuarios.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +14,8 @@ namespace EduApoyos.Application.Interfaces
     {
         Task<AuthResponse> RegistrarAsync(RegisterRequest request, CancellationToken ct = default);
         Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken ct = default);
+
+        Task<PerfilResponse> ObtenerPerfilAsync(Guid usuarioId, CancellationToken ct);
+        Task<PerfilResponse> ActualizarPerfilAsync(Guid usuarioId, ActualizarPerfilRequest request, CancellationToken ct);
     }
 }

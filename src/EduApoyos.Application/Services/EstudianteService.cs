@@ -72,7 +72,8 @@ public class EstudianteService : IEstudianteService
         NumeroDocumento = e.NumeroDocumento,
         TipoDocumento = e.TipoDocumento,
         ProgramaAcademico = e.ProgramaAcademico,
-        Semestre = e.Semestre
+        Semestre = e.Semestre,
+        Activo=e.Activo
     };
 
     public async Task<EstudianteResponse> ObtenerPorUsuarioIdAsync(
@@ -107,6 +108,34 @@ public class EstudianteService : IEstudianteService
         return Mapear(estudiante);
     }
 
+
+    public async Task<List<EstudianteBusquedaResponse>> BuscarPorDocumentoAsync(
+    string? filtro, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(filtro))
+            return new List<EstudianteBusquedaResponse>();
+
+        var estudiantes = await _unitOfWork.Estudiantes.BuscarPorDocumentoAsync(filtro, ct);
+
+        var usuarioIds = estudiantes
+            .Where(e => e.UsuarioId.HasValue)
+            .Select(e => e.UsuarioId!.Value);
+
+        var nombresPorUsuarioId = await _usuarioLookup.ObtenerNombresPorUsuarioIdsAsync(usuarioIds, ct);
+
+        return estudiantes.Select(e => new EstudianteBusquedaResponse
+        {
+            Id = e.Id,
+            TipoDocumento = e.TipoDocumento,
+            NumeroDocumento = e.NumeroDocumento,
+            ProgramaAcademico = e.ProgramaAcademico,
+            NombreCompleto = e.UsuarioId.HasValue && nombresPorUsuarioId.TryGetValue(e.UsuarioId.Value, out var n)
+                ? n
+                : null
+        }).ToList();
+    }
+
+    
     public async Task EliminarAsync(Guid id, CancellationToken ct = default)
     {
         var estudiante = await _unitOfWork.Estudiantes.ObtenerPorIdAsync(id, ct)
@@ -119,7 +148,8 @@ public class EstudianteService : IEstudianteService
             throw new ConflictException(
                 $"El estudiante '{id}' tiene solicitudes activas y no puede eliminarse.");
 
-        _unitOfWork.Estudiantes.Eliminar(estudiante);
+        estudiante.Desactivar();
+
         await _unitOfWork.GuardarCambiosAsync(ct);
     }
 

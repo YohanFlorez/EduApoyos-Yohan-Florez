@@ -52,9 +52,24 @@ public class EstudianteRepository : IEstudianteRepository
         //    .ToListAsync(ct);
     }
 
+    public async Task<List<Estudiante>> BuscarPorDocumentoAsync(string filtro, CancellationToken ct)
+    {
+        var query = _context.Estudiantes.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filtro))
+            query = query.Where(e => e.NumeroDocumento.Contains(filtro));
+
+        return await query
+            .OrderBy(e => e.NumeroDocumento)
+            .Take(20) // límite razonable para un selector
+            .ToListAsync(ct);
+    }
+
     public void Eliminar(Estudiante estudiante)
     {
         _context.Estudiantes.Remove(estudiante);
     }
+
+
 
 }

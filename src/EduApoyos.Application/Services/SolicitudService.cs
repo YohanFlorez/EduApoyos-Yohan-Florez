@@ -71,15 +71,22 @@ public class SolicitudService : ISolicitudService
 
     public async Task<SolicitudDetalleResponse> CambiarEstadoAsync(Guid id, CambiarEstadoRequest request, Guid asesorId, CancellationToken ct = default)
     {
-        var solicitud = await _unitOfWork.Solicitudes.ObtenerPorIdConHistorialAsync(id, ct)
+        try
+        {
+            var solicitud = await _unitOfWork.Solicitudes.ObtenerPorIdConHistorialAsync(id, ct)
             ?? throw new NotFoundException(nameof(SolicitudApoyo), id);
 
-        // La entidad valida la transición usando la estrategia (patrón Strategy) y genera el HistorialEstado.
-        solicitud.CambiarEstado(request.NuevoEstado, asesorId, _estadoStrategy, request.Observacion, asesorId);
+            // La entidad valida la transición usando la estrategia (patrón Strategy) y genera el HistorialEstado.
+            solicitud.CambiarEstado(request.NuevoEstado, asesorId, _estadoStrategy, request.Observacion, asesorId);
 
-        await _unitOfWork.GuardarCambiosAsync(ct);
+            await _unitOfWork.GuardarCambiosAsync(ct);
 
-        return MapearDetalle(solicitud);
+            return MapearDetalle(solicitud);
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
 
     public async Task<PagedResponse<SolicitudListItemResponse>> ListarPorEstudianteAsync(

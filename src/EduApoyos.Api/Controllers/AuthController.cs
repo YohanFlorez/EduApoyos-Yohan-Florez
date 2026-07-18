@@ -1,9 +1,13 @@
 using EduApoyos.Application.DTOs.Auth;
 using EduApoyos.Application.DTOs.Auth.Request;
 using EduApoyos.Application.DTOs.Auth.Response;
+using EduApoyos.Application.DTOs.Usuarios.Request;
+using EduApoyos.Application.DTOs.Usuarios.Response;
 using EduApoyos.Application.Interfaces;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EduApoyos.Api.Controllers;
 
@@ -16,14 +20,16 @@ public class AuthController : ControllerBase
     private readonly IValidator<RegisterRequest> _registerValidator;
     private readonly IValidator<LoginRequest> _loginValidator;
 
-    public AuthController(IAuthService authService, IValidator<RegisterRequest> registerValidator, IValidator<LoginRequest> loginValidator)
+    public AuthController(
+        IAuthService authService,
+        IValidator<RegisterRequest> registerValidator,
+        IValidator<LoginRequest> loginValidator)
     {
         _authService = authService;
         _registerValidator = registerValidator;
         _loginValidator = loginValidator;
     }
 
-    ///Registra un nuevo usuario (Asesor o Estudiante) y devuelve un jwt
     [HttpPost("register")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -34,7 +40,6 @@ public class AuthController : ControllerBase
         return Created(string.Empty, respuesta);
     }
 
-    /// Autentica un usuario existente y devuelve un jwt.
     [HttpPost("login")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -43,5 +48,31 @@ public class AuthController : ControllerBase
         await _loginValidator.ValidateAndThrowAsync(request, ct);
         var respuesta = await _authService.LoginAsync(request, ct);
         return Ok(respuesta);
+    }
+
+    [Authorize]
+    [HttpGet("perfil")]
+    [ProducesResponseType(typeof(PerfilResponse), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PerfilResponse>> ObtenerPerfil(CancellationToken ct)
+    {
+        var respuesta = await _authService.ObtenerPerfilAsync(ObtenerUsuarioIdActual(), ct);
+        return Ok(respuesta);
+    }
+
+    [Authorize]
+    [HttpPut("perfil")]
+    [ProducesResponseType(typeof(PerfilResponse), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PerfilResponse>> ActualizarPerfil(
+        [FromBody] ActualizarPerfilRequest request, CancellationToken ct)
+    {
+        var respuesta = await _authService.ActualizarPerfilAsync(ObtenerUsuarioIdActual(), request, ct);
+        return Ok(respuesta);
+    }
+
+    private Guid ObtenerUsuarioIdActual()
+    {
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new UnauthorizedAccessException("Token sin identificador de usuario.");
+        return Guid.Parse(idClaim);
     }
 }
