@@ -1,0 +1,46 @@
+<section class="barra-filtros">
+  <div class="campo-filtro">
+    <label for="filtroTipo">Tipo de documento</label>
+    <select
+      id="filtroTipo"
+      [value]="tipoDocumento()"
+      (change)="onTipoDocumentoChange($any($event.target).value)"
+    >
+      <option value="TODOS">Todos</option>
+      <option value="CC">Cédula de ciudadanía</option>
+      <option value="TI">Tarjeta de identidad</option>
+      <option value="CE">Cédula de extranjería</option>
+      <option value="PA">Pasaporte</option>
+    </select>
+  </div>
+
+  <div class="campo-filtro">
+    <label for="filtroNumero">Número de documento</label>
+    <input
+      id="filtroNumero"
+      type="text"
+      placeholder="Buscar por número..."
+      [value]="numeroDocumento()"
+      (input)="onNumeroDocumentoChange($any($event.target).value)"
+    >
+  </div>
+
+  <div class="campo-filtro">
+    <label for="filtroEstado">Estado</label>
+    <select
+      id="filtroEstado"
+      [value]="estado()"
+      (change)="onEstadoChange($any($event.target).value)"
+    >
+      <option value="todos">Todos</option>
+      <option value="activos">Activos</option>
+      <option value="inactivos">Inactivos</option>
+    </select>
+  </div>
+
+  @if (hayFiltrosActivos()) {
+    <button type="button" class="btn-texto btn-limpiar-filtros" (click)="limpiar()">
+      Limpiar filtros
+    </button>
+  }
+</section>

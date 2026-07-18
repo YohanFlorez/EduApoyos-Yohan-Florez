@@ -160,16 +160,16 @@ public class EstudiantesController : ControllerBase
     }
 
     /// <summary>
-    /// Elimina un estudiante. Falla con 409 si tiene solicitudes activas asociadas.
+    /// Desabilita a un estudiante cambia el campo activo a 0
     /// </summary>
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Asesor")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Eliminar(Guid id, CancellationToken ct)
+    public async Task<IActionResult> DesactivarAsync(Guid id, CancellationToken ct)
     {
-        await _estudianteService.EliminarAsync(id, ct);
+        await _estudianteService.DesactivarAsync(id, ct);
         return NoContent();
     }
 

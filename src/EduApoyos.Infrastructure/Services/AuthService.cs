@@ -42,6 +42,7 @@ public class AuthService : IAuthService
             FechaRegistro = DateTime.UtcNow
         };
 
+        // para evitar registros incompletos si algo falla a mitad de camino.
         var resultado = await _userManager.CreateAsync(usuario, request.Password);
         if (!resultado.Succeeded)
             throw new AuthException(string.Join(" | ", resultado.Errors.Select(e => e.Description)));
