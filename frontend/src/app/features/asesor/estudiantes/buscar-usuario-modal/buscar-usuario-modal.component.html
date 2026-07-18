@@ -1,0 +1,25 @@
+@if (visible()) {
+  <div class="modal-overlay" (click)="cerrar()">
+    <div class="modal-contenido" (click)="$event.stopPropagation()">
+      <h3>Buscar estudiante</h3>
+      <input type="text" [formControl]="busquedaControl" placeholder="Buscar por nombre o correo..." autofocus>
+
+      @if (buscando()) {
+        <p class="modal-info">Buscando...</p>
+      } @else if (resultados().length === 0) {
+        <p class="modal-info">No se encontraron estudiantes pendientes de registro académico.</p>
+      } @else {
+        <ul class="lista-resultados">
+          @for (u of resultados(); track u.id) {
+            <li (click)="seleccionar(u)">
+              <strong>{{ u.nombreCompleto }}</strong>
+              <span>{{ u.email }}</span>
+            </li>
+          }
+        </ul>
+      }
+
+      <button type="button" class="btn-cancelar" (click)="cerrar()">Cancelar</button>
+    </div>
+  </div>
+}

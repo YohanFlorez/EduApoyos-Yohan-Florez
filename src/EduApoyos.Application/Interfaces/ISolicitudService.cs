@@ -14,7 +14,7 @@ namespace EduApoyos.Application.Interfaces
 {
     public interface ISolicitudService
     {
-        Task<SolicitudDetalleResponse> CrearAsync(CrearSolicitudRequest request, Guid usuarioActualId, CancellationToken ct = default);
+        Task<SolicitudDetalleResponse> CrearAsync(CrearSolicitudRequest request, Guid usuarioActualId, RolUsuario rolActual, CancellationToken ct = default);
 
         Task<PagedResponse<SolicitudListItemResponse>> ListarAsync(
             EstadoSolicitud? estado, TipoApoyo? tipoApoyo, DateTime? fechaDesde, DateTime? fechaHasta,

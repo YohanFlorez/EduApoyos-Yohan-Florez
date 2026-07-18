@@ -56,7 +56,8 @@ public class SolicitudesController : ControllerBase
     {
         await _crearValidator.ValidateAndThrowAsync(request, ct);
         var usuarioId = _currentUser.UsuarioId!.Value;
-        var creado = await _solicitudService.CrearAsync(request, usuarioId, ct);
+        var rol = _currentUser.Rol!.Value;
+        var creado = await _solicitudService.CrearAsync(request, usuarioId, rol, ct);
         return CreatedAtAction(nameof(ObtenerDetalle), new { id = creado.Id }, creado);
     }
 

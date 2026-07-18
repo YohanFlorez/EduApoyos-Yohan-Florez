@@ -23,7 +23,7 @@ namespace EduApoyos.Application.Interfaces
 
         Task<List<EstudianteBusquedaResponse>> BuscarPorDocumentoAsync(string? filtro, CancellationToken ct = default);
 
-        Task EliminarAsync(Guid id, CancellationToken ct);
+        Task DesactivarAsync(Guid id, CancellationToken ct);
 
     }
 }

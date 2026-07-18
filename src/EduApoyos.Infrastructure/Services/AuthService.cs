@@ -5,7 +5,6 @@ using EduApoyos.Application.DTOs.Usuarios.Request;
 using EduApoyos.Application.DTOs.Usuarios.Response;
 using EduApoyos.Application.Exceptions;
 using EduApoyos.Application.Interfaces;
-using EduApoyos.Domain.Entities;
 using EduApoyos.Domain.Enums;
 using EduApoyos.Domain.Interfaces;
 using EduApoyos.Infrastructure.Identity;
@@ -18,12 +17,20 @@ public class AuthService : IAuthService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IReadOnlyDictionary<RolUsuario, IPostRegistroHandler> _postRegistroHandlers;
 
-    public AuthService(UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtTokenGenerator, IUnitOfWork unitOfWork)
+    public AuthService(
+        UserManager<ApplicationUser> userManager,
+        IJwtTokenGenerator jwtTokenGenerator,
+        IUnitOfWork unitOfWork,
+        IEnumerable<IPostRegistroHandler> postRegistroHandlers)
     {
         _userManager = userManager;
         _jwtTokenGenerator = jwtTokenGenerator;
         _unitOfWork = unitOfWork;
+
+    
+        _postRegistroHandlers = postRegistroHandlers.ToDictionary(h => h.Rol);
     }
 
     public async Task<AuthResponse> RegistrarAsync(RegisterRequest request, CancellationToken ct = default)
@@ -42,23 +49,31 @@ public class AuthService : IAuthService
             FechaRegistro = DateTime.UtcNow
         };
 
-        var resultado = await _userManager.CreateAsync(usuario, request.Password);
-        if (!resultado.Succeeded)
-            throw new AuthException(string.Join(" | ", resultado.Errors.Select(e => e.Description)));
-
-        await _userManager.AddToRoleAsync(usuario, request.Rol.ToString());
-
-        if (request.Rol == RolUsuario.Estudiante)
+        // Toda la operación va en una sola transacción
+        // para evitar  si algo falla 
+        await _unitOfWork.IniciarTransaccionAsync(ct);
+        try
         {
-            var estudiante = new Estudiante(
-             request.NumeroDocumento!,
-             request.TipoDocumento!,
-             request.ProgramaAcademico!,
-             request.Semestre!.Value,
-             usuario.Id);
+            var resultado = await _userManager.CreateAsync(usuario, request.Password);
+            if (!resultado.Succeeded)
+                throw new AuthException(string.Join(" | ", resultado.Errors.Select(e => e.Description)));
 
-            await _unitOfWork.Estudiantes.AgregarAsync(estudiante, ct);
+            var rolResult = await _userManager.AddToRoleAsync(usuario, request.Rol.ToString());
+            if (!rolResult.Succeeded)
+                throw new AuthException(string.Join(" | ", rolResult.Errors.Select(e => e.Description)));
+
+            if (_postRegistroHandlers.TryGetValue(request.Rol, out var handler))
+            {
+                await handler.EjecutarAsync(usuario.Id, request, ct);
+            }
+
             await _unitOfWork.GuardarCambiosAsync(ct);
+            await _unitOfWork.ConfirmarTransaccionAsync(ct);
+        }
+        catch
+        {
+            await _unitOfWork.RevertirTransaccionAsync(ct);
+            throw;
         }
 
         var (token, expiraEn) = _jwtTokenGenerator.GenerarToken(usuario.Id, usuario.Email!, usuario.Rol, usuario.NombreCompleto);
@@ -135,12 +150,12 @@ public class AuthService : IAuthService
     }
 
     private static PerfilResponse MapearPerfil(ApplicationUser u) =>
-     new PerfilResponse
-     {
-         Id = u.Id,
-         NombreCompleto = u.NombreCompleto,
-         Email = u.Email!,
-         Rol = u.Rol.ToString(),
-         FechaRegistro = u.FechaRegistro
-     };
+        new PerfilResponse
+        {
+            Id = u.Id,
+            NombreCompleto = u.NombreCompleto,
+            Email = u.Email!,
+            Rol = u.Rol.ToString(),
+            FechaRegistro = u.FechaRegistro
+        };
 }

@@ -1,0 +1,101 @@
+<section class="card-formulario" [class.card-formulario--edicion]="editando()">
+  <div class="card-formulario__header">
+    <h2>{{ editando() ? 'Editar estudiante' : 'Registrar estudiante' }}</h2>
+    @if (editando()) {
+      <span class="badge-edicion">Modo edición</span>
+    }
+  </div>
+
+  @if (!editando()) {
+    <p class="ayuda">
+      El usuario (correo/contraseña) debe existir previamente — normalmente se crea vía
+      "Registro" con rol Estudiante. Use el botón "Consultar" para seleccionarlo.
+    </p>
+  }
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()">
+
+    <div class="campo">
+      <label>Estudiante</label>
+      @if (editando()) {
+        <input type="text" [value]="nombreSeleccionado()" readonly class="input-solo-lectura">
+      } @else {
+        <div class="campo-con-boton">
+          <input
+            type="text"
+            [value]="nombreSeleccionado() || 'Ningún estudiante seleccionado'"
+            readonly
+            class="input-solo-lectura"
+          >
+          <button type="button" class="btn-outline" (click)="abrirModal()">Consultar</button>
+        </div>
+        @if (f.usuarioId.invalid && f.usuarioId.touched) {
+          <small class="error">Debe seleccionar un estudiante.</small>
+        }
+      }
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label for="tipoDocumento">Tipo de documento</label>
+        <select id="tipoDocumento" formControlName="tipoDocumento">
+          <option value="CC">Cédula de ciudadanía</option>
+          <option value="TI">Tarjeta de identidad</option>
+          <option value="CE">Cédula de extranjería</option>
+          <option value="PA">Pasaporte</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="numeroDocumento">Número de documento</label>
+        <input
+          id="numeroDocumento"
+          type="text"
+          formControlName="numeroDocumento"
+          placeholder="Ej. 1012345678"
+        >
+        @if (f.numeroDocumento.invalid && f.numeroDocumento.touched) {
+          <small class="error">El número de documento es obligatorio.</small>
+        }
+      </div>
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label for="programaAcademico">Programa académico</label>
+        <input
+          id="programaAcademico"
+          type="text"
+          formControlName="programaAcademico"
+          placeholder="Ej. Ingeniería de Sistemas"
+        >
+        @if (f.programaAcademico.invalid && f.programaAcademico.touched) {
+          <small class="error">El programa académico es obligatorio.</small>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="semestre">Semestre</label>
+        <input id="semestre" type="number" formControlName="semestre" min="1" max="20">
+        @if (f.semestre.invalid && f.semestre.touched) {
+          <small class="error">Ingrese un semestre entre 1 y 20.</small>
+        }
+      </div>
+    </div>
+
+    <div class="acciones-formulario">
+      <button type="button" class="btn-texto" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-primario" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : (editando() ? 'Actualizar estudiante' : 'Guardar estudiante') }}
+      </button>
+    </div>
+  </form>
+</section>
+
+<app-buscar-usuario-modal
+  [visible]="mostrarModal()"
+  (cerrado)="cerrarModal()"
+  (seleccionado)="seleccionarUsuario($event)"
+/>

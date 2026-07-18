@@ -1,0 +1,81 @@
+<div class="pagina-estudiantes">
+
+  <header class="encabezado">
+    <div>
+      <p class="eyebrow">GESTIÓN ACADÉMICA</p>
+      <h1>Estudiantes</h1>
+    </div>
+    <button type="button" class="btn-secundario" (click)="toggleFormulario()">
+      {{ mostrarFormulario() ? 'Cancelar' : 'Registrar estudiante' }}
+    </button>
+  </header>
+
+  @if (mostrarFormulario()) {
+    <app-estudiante-formulario
+      [estudiante]="editando()"
+      (guardado)="onGuardado()"
+      (cancelado)="toggleFormulario()"
+    />
+  }
+
+  @if (!mostrarFormulario()) {
+    <app-estudiantes-filtros
+      [(tipoDocumento)]="filtroTipoDocumento"
+      [(numeroDocumento)]="filtroNumeroDocumento"
+      [(estado)]="filtroEstado"
+    />
+  }
+
+  @if (cargando()) {
+    <app-spinner />
+  } @else if (!mostrarFormulario()) {
+    <table class="tabla-estudiantes">
+      <thead>
+        <tr>
+          <th>Documento</th>
+          <th>Programa académico</th>
+          <th>Semestre</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (estudiante of estudiantesFiltrados(); track estudiante.id) {
+          <tr [class.fila-inactiva]="!estudiante.activo">
+            <td>{{ estudiante.tipoDocumento }} {{ estudiante.numeroDocumento }}</td>
+            <td>{{ estudiante.programaAcademico }}</td>
+            <td>{{ estudiante.semestre }}</td>
+            <td>
+              <span class="badge-estado" [class.badge-estado--inactivo]="!estudiante.activo">
+                {{ estudiante.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="acciones">
+              <a [routerLink]="['/estudiantes', estudiante.id, 'solicitudes']" class="link-accion">
+                Ver solicitudes
+              </a>
+              <button type="button" class="link-accion" (click)="editar(estudiante)">
+                Editar
+              </button>
+              @if (estudiante.activo) {
+                <button
+                  type="button"
+                  class="link-accion link-peligro"
+                  [disabled]="eliminando() === estudiante.id"
+                  (click)="eliminar(estudiante)"
+                >
+                  {{ eliminando() === estudiante.id ? 'Eliminando...' : 'Eliminar' }}
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="sin-datos">No hay estudiantes que coincidan con los filtros.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+</div>
