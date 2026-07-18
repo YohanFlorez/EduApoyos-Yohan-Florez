@@ -1,0 +1,122 @@
+:host {
+  display: block;
+  --color-primario: #2563eb;
+  --color-primario-hover: #1d4ed8;
+  --color-borde: #e2e8f0;
+  --color-texto: #1e293b;
+  --color-texto-suave: #64748b;
+  --color-fondo-suave: #f8fafc;
+  --color-peligro: #dc2626;
+  --radio: 10px;
+  --sombra: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.pagina-perfil {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  color: var(--color-texto);
+}
+
+.encabezado {
+  margin-bottom: 1.5rem;
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--color-texto-suave);
+    text-transform: uppercase;
+    margin: 0 0 0.25rem;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.card-formulario {
+  background: #fff;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 1.75rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.1rem;
+
+  label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-texto-suave);
+  }
+
+  input {
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--color-borde);
+    border-radius: 7px;
+    background: #fff;
+    color: var(--color-texto);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primario);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+  }
+}
+
+.input-solo-lectura {
+  background: var(--color-fondo-suave) !important;
+  color: var(--color-texto-suave);
+  cursor: default;
+}
+
+.ayuda {
+  font-size: 0.78rem;
+  color: var(--color-texto-suave);
+}
+
+.error {
+  font-size: 0.78rem;
+  color: var(--color-peligro);
+}
+
+.acciones-formulario {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--color-borde);
+  padding-top: 1.1rem;
+}
+
+.btn-primario {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--color-primario);
+  color: #fff;
+  border: none;
+  padding: 0.65rem 1.4rem;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primario-hover);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

@@ -1,0 +1,42 @@
+<div class="pagina-perfil">
+  <header class="encabezado">
+    <p class="eyebrow">MI CUENTA</p>
+    <h1>Mi perfil</h1>
+  </header>
+
+  @if (cargando()) {
+    <app-spinner />
+  } @else {
+    <section class="card-formulario">
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+        <div class="campo">
+          <label for="nombreCompleto">Nombre completo</label>
+          <input id="nombreCompleto" type="text" formControlName="nombreCompleto">
+          @if (f.nombreCompleto.invalid && f.nombreCompleto.touched) {
+            <small class="error">Ingrese un nombre válido (mínimo 3 caracteres).</small>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="email">Correo electrónico</label>
+          <input id="email" type="email" formControlName="email">
+          @if (f.email.invalid && f.email.touched) {
+            <small class="error">Ingrese un correo electrónico válido.</small>
+          }
+        </div>
+
+        <div class="campo campo-solo-lectura">
+          <label>Rol</label>
+          <input type="text" [value]="rolActual()" readonly class="input-solo-lectura">
+          <small class="ayuda">El rol no puede modificarse desde su perfil.</small>
+        </div>
+
+        <div class="acciones-formulario">
+          <button type="submit" class="btn-primario" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+</div>

@@ -1,0 +1,40 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">Historial del estudiante</span>
+      <h1>Solicitudes</h1>
+    </div>
+    <a routerLink="/estudiantes" class="btn btn-ghost">‹ Volver a estudiantes</a>
+  </div>
+
+  @if (cargando()) {
+    <app-spinner etiqueta="Cargando…" />
+  } @else if (solicitudes().length === 0) {
+    <div class="card table-empty"><p>Este estudiante no tiene solicitudes registradas.</p></div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Monto</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (solicitud of solicitudes(); track solicitud.id) {
+            <tr>
+              <td>{{ tipoLabel[solicitud.tipoApoyo] }}</td>
+              <td>{{ solicitud.montoSolicitado | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</td>
+              <td><app-status-badge [estado]="solicitud.estado" /></td>
+              <td>{{ solicitud.fechaSolicitud | date: 'd MMM y' }}</td>
+              <td><a [routerLink]="['/solicitudes', solicitud.id]" class="btn btn-secondary btn-sm">Ver detalle</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -1,0 +1,238 @@
+<div class="pagina-estudiantes">
+
+  <header class="encabezado">
+    <div>
+      <p class="eyebrow">GESTIÓN ACADÉMICA</p>
+      <h1>Estudiantes</h1>
+    </div>
+    <button type="button" class="btn-secundario" (click)="toggleFormulario()">
+      {{ mostrarFormulario() ? 'Cancelar' : 'Registrar estudiante' }}
+    </button>
+  </header>
+
+  @if (mostrarFormulario()) {
+    <section class="card-formulario" [class.card-formulario--edicion]="editando()">
+      <div class="card-formulario__header">
+        <h2>{{ editando() ? 'Editar estudiante' : 'Registrar estudiante' }}</h2>
+        @if (editando()) {
+          <span class="badge-edicion">Modo edición</span>
+        }
+      </div>
+
+      @if (!editando()) {
+        <p class="ayuda">
+          El usuario (correo/contraseña) debe existir previamente — normalmente se crea vía
+          "Registro" con rol Estudiante. Use el botón "Consultar" para seleccionarlo.
+        </p>
+      }
+
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+
+        <div class="campo">
+          <label>Estudiante</label>
+          @if (editando()) {
+            <input type="text" [value]="nombreSeleccionado()" readonly class="input-solo-lectura">
+          } @else {
+            <div class="campo-con-boton">
+              <input
+                type="text"
+                [value]="nombreSeleccionado() || 'Ningún estudiante seleccionado'"
+                readonly
+                class="input-solo-lectura"
+              >
+              <button type="button" class="btn-outline" (click)="abrirModal()">Consultar</button>
+            </div>
+            @if (f.usuarioId.invalid && f.usuarioId.touched) {
+              <small class="error">Debe seleccionar un estudiante.</small>
+            }
+          }
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="tipoDocumento">Tipo de documento</label>
+            <select id="tipoDocumento" formControlName="tipoDocumento">
+              <option value="CC">Cédula de ciudadanía</option>
+              <option value="TI">Tarjeta de identidad</option>
+              <option value="CE">Cédula de extranjería</option>
+              <option value="PA">Pasaporte</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label for="numeroDocumento">Número de documento</label>
+            <input
+              id="numeroDocumento"
+              type="text"
+              formControlName="numeroDocumento"
+              placeholder="Ej. 1012345678"
+            >
+            @if (f.numeroDocumento.invalid && f.numeroDocumento.touched) {
+              <small class="error">El número de documento es obligatorio.</small>
+            }
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="programaAcademico">Programa académico</label>
+            <input
+              id="programaAcademico"
+              type="text"
+              formControlName="programaAcademico"
+              placeholder="Ej. Ingeniería de Sistemas"
+            >
+            @if (f.programaAcademico.invalid && f.programaAcademico.touched) {
+              <small class="error">El programa académico es obligatorio.</small>
+            }
+          </div>
+
+          <div class="campo">
+            <label for="semestre">Semestre</label>
+            <input id="semestre" type="number" formControlName="semestre" min="1" max="20">
+            @if (f.semestre.invalid && f.semestre.touched) {
+              <small class="error">Ingrese un semestre entre 1 y 20.</small>
+            }
+          </div>
+        </div>
+
+        <div class="acciones-formulario">
+          <button type="button" class="btn-texto" (click)="toggleFormulario()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primario" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando...' : (editando() ? 'Actualizar estudiante' : 'Guardar estudiante') }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  @if (!editando()) {
+    <section class="barra-filtros">
+      <div class="campo-filtro">
+        <label for="filtroTipo">Tipo de documento</label>
+        <select
+          id="filtroTipo"
+          [value]="filtroTipoDocumento()"
+          (change)="filtroTipoDocumento.set($any($event.target).value)"
+        >
+          <option value="TODOS">Todos</option>
+          <option value="CC">Cédula de ciudadanía</option>
+          <option value="TI">Tarjeta de identidad</option>
+          <option value="CE">Cédula de extranjería</option>
+          <option value="PA">Pasaporte</option>
+        </select>
+      </div>
+
+      <div class="campo-filtro">
+        <label for="filtroNumero">Número de documento</label>
+        <input
+          id="filtroNumero"
+          type="text"
+          placeholder="Buscar por número..."
+          [value]="filtroNumeroDocumento()"
+          (input)="filtroNumeroDocumento.set($any($event.target).value)"
+        >
+      </div>
+
+      <div class="campo-filtro">
+        <label for="filtroEstado">Estado</label>
+        <select
+          id="filtroEstado"
+          [value]="filtroEstado()"
+          (change)="filtroEstado.set($any($event.target).value)"
+        >
+          <option value="todos">Todos</option>
+          <option value="activos">Activos</option>
+          <option value="inactivos">Inactivos</option>
+        </select>
+      </div>
+
+      @if (hayFiltrosActivos()) {
+        <button type="button" class="btn-texto btn-limpiar-filtros" (click)="limpiarFiltros()">
+          Limpiar filtros
+        </button>
+      }
+    </section>
+  }
+
+  @if (cargando()) {
+    <app-spinner />
+  } @else if (!editando()) {
+    <table class="tabla-estudiantes">
+      <thead>
+        <tr>
+          <th>Documento</th>
+          <th>Programa académico</th>
+          <th>Semestre</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (estudiante of estudiantesFiltrados(); track estudiante.id) {
+          <tr [class.fila-inactiva]="!estudiante.activo">
+            <td>{{ estudiante.tipoDocumento }} {{ estudiante.numeroDocumento }}</td>
+            <td>{{ estudiante.programaAcademico }}</td>
+            <td>{{ estudiante.semestre }}</td>
+            <td>
+              <span class="badge-estado" [class.badge-estado--inactivo]="!estudiante.activo">
+                {{ estudiante.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="acciones">
+              <a [routerLink]="['/estudiantes', estudiante.id, 'solicitudes']" class="link-accion">
+                Ver solicitudes
+              </a>
+              <button type="button" class="link-accion" (click)="editar(estudiante)">
+                Editar
+              </button>
+              @if (estudiante.activo) {
+                <button
+                  type="button"
+                  class="link-accion link-peligro"
+                  [disabled]="eliminando() === estudiante.id"
+                  (click)="eliminar(estudiante)"
+                >
+                  {{ eliminando() === estudiante.id ? 'Eliminando...' : 'Eliminar' }}
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="sin-datos">No hay estudiantes que coincidan con los filtros.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (mostrarModal()) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-contenido" (click)="$event.stopPropagation()">
+        <h3>Buscar estudiante</h3>
+        <input type="text" [formControl]="busquedaControl" placeholder="Buscar por nombre o correo..." autofocus>
+
+        @if (buscando()) {
+          <p class="modal-info">Buscando...</p>
+        } @else if (resultadosBusqueda().length === 0) {
+          <p class="modal-info">No se encontraron estudiantes pendientes de registro académico.</p>
+        } @else {
+          <ul class="lista-resultados">
+            @for (u of resultadosBusqueda(); track u.id) {
+              <li (click)="seleccionarUsuario(u)">
+                <strong>{{ u.nombreCompleto }}</strong>
+                <span>{{ u.email }}</span>
+              </li>
+            }
+          </ul>
+        }
+
+        <button type="button" class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  }
+
+</div>
