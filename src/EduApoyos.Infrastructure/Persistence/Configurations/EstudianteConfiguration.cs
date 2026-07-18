@@ -16,21 +16,27 @@ public class EstudianteConfiguration : IEntityTypeConfiguration<Estudiante>
         builder.Property(e => e.TipoDocumento).IsRequired().HasMaxLength(20);
         builder.Property(e => e.ProgramaAcademico).IsRequired().HasMaxLength(150);
 
-        // UsuarioId es opcional: el estudiante puede existir sin cuenta todavía
+        // UsuarioId es opciona porque el estudiante puede existir sin cuenta todavía
         builder.Property(e => e.UsuarioId).IsRequired(false);
-
-        // NUEVO: esto es lo que faltaba. Sin esto, UsuarioId era solo una
-        // columna suelta, sin restricción real de integridad hacia Usuarios.
+        builder.Property(e => e.Activo)
+               .HasDefaultValue(true);
+       
         builder.HasOne<ApplicationUser>()
             .WithOne()
             .HasForeignKey<Estudiante>(e => e.UsuarioId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Índices para agilizar consultas
-        builder.HasIndex(e => e.NumeroDocumento).IsUnique();
+        builder.HasIndex(e => e.NumeroDocumento)
+            .IsUnique()
+            .HasFilter("[Activo] = 1")
+            .HasDatabaseName("IX_Estudiantes_NumeroDocumento");
 
         // Único, pero permite múltiples estudiantes con UsuarioId = NULL
         builder.HasIndex(e => e.UsuarioId).IsUnique();
+        builder.HasIndex(e => e.Activo)
+                .HasFilter("[Activo] = 1")
+                .HasDatabaseName("IX_Estudiantes_Activo");
 
         builder.HasMany(e => e.Solicitudes)
             .WithOne()

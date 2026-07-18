@@ -148,6 +148,17 @@ public class EstudiantesController : ControllerBase
         return Ok(actualizado);
     }
 
+    /// <summary>Busca estudiantes registrados por número de documento (para selectores).</summary>
+    [HttpGet("buscar")]
+    [Authorize(Roles = "Asesor")]
+    [ProducesResponseType(typeof(List<EstudianteBusquedaResponse>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<EstudianteBusquedaResponse>>> Buscar(
+        [FromQuery] string? filtro, CancellationToken ct)
+    {
+        var resultados = await _estudianteService.BuscarPorDocumentoAsync(filtro, ct);
+        return Ok(resultados);
+    }
+
     /// <summary>
     /// Elimina un estudiante. Falla con 409 si tiene solicitudes activas asociadas.
     /// </summary>

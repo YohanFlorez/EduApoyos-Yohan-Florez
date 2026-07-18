@@ -20,6 +20,9 @@ namespace EduApoyos.Application.Interfaces
         Task<EstudianteResponse> ObtenerPorUsuarioIdAsync(Guid usuarioId, CancellationToken ct);
 
         Task<EstudianteResponse> ActualizarAsync(Guid id, ActualizarEstudianteRequest request, CancellationToken ct);
+
+        Task<List<EstudianteBusquedaResponse>> BuscarPorDocumentoAsync(string? filtro, CancellationToken ct = default);
+
         Task EliminarAsync(Guid id, CancellationToken ct);
 
     }

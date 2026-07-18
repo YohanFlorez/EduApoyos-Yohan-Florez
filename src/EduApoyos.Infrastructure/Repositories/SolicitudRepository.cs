@@ -60,13 +60,13 @@ public class SolicitudRepository : ISolicitudRepository
     {
         await _context.Solicitudes.AddAsync(solicitud, ct);
     }
-       
+
 
 
 
     public async Task<bool> TieneSolicitudesActivasAsync(Guid estudianteId, CancellationToken ct)
     {
-        var estadosActivos = new[] { EstadoSolicitud.Pendiente, EstadoSolicitud.EnRevision }; // ajusta a tus enums reales
+        var estadosActivos = new[] { EstadoSolicitud.Pendiente, EstadoSolicitud.EnRevision };
         return await _context.Solicitudes
             .AnyAsync(s => s.EstudianteId == estudianteId && estadosActivos.Contains(s.Estado), ct);
     }
