@@ -1,0 +1,57 @@
+.linea-tiempo {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.linea-tiempo::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--color-line-strong);
+}
+
+.linea-tiempo li {
+  display: flex;
+  gap: 16px;
+  padding: 0 0 20px;
+  position: relative;
+}
+
+.linea-tiempo li:last-child {
+  padding-bottom: 0;
+}
+
+.linea-tiempo-punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  margin-top: 6px;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.linea-tiempo strong {
+  font-size: 0.88rem;
+  display: block;
+}
+
+.linea-tiempo-fecha {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-ink-faint);
+}
+
+.linea-tiempo-obs {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}

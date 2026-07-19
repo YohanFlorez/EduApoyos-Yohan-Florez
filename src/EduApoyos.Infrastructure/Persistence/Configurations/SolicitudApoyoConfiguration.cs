@@ -10,7 +10,7 @@ public class SolicitudApoyoConfiguration : IEntityTypeConfiguration<SolicitudApo
     {
         builder.ToTable("Solicitudes");
         builder.HasKey(s => s.Id);
-
+        builder.Property(s => s.Id).ValueGeneratedNever();
         builder.Property(s => s.MontoSolicitado).HasColumnType("decimal(18,2)");
         builder.Property(s => s.Descripcion).IsRequired().HasMaxLength(1000);
         builder.Property(s => s.TipoApoyo).HasConversion<int>();

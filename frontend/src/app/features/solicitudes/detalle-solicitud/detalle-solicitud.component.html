@@ -1,0 +1,88 @@
+<div class="page" style="max-width: 760px;">
+  @if (cargando()) {
+    <app-spinner etiqueta="Cargando solicitud…" />
+  } @else if (solicitud()) {
+    @let detalle = solicitud()!;
+    <div class="page-header">
+      <div>
+        <span class="page-eyebrow">Expediente {{ detalle.id.slice(0, 8) }}</span>
+        <h1>{{ tipoLabel[detalle.tipoApoyo] }} — {{ detalle.montoSolicitado | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</h1>
+      </div>
+      <app-status-badge [estado]="detalle.estado" />
+    </div>
+
+    <div class="stack">
+      <div class="card">
+        <h2>Descripción</h2>
+        <p style="color: var(--color-ink-soft);">{{ detalle.descripcion }}</p>
+
+        <hr class="divisor" />
+
+        <div class="form-grid">
+          <div>
+            <span class="page-eyebrow">Fecha de solicitud</span>
+            <p style="margin: 0;">{{ detalle.fechaSolicitud | date: 'd \'de\' MMMM, y' }}</p>
+          </div>
+          <div>
+            <span class="page-eyebrow">Última actualización</span>
+            <p style="margin: 0;">{{ detalle.fechaActualizacion | date: 'd \'de\' MMMM, y' }}</p>
+          </div>
+        </div>
+      </div>
+
+      @if (esAsesor && transicionesDisponibles().length > 0) {
+        <div class="card">
+          <h2>Cambiar estado</h2>
+          <div class="stack">
+            <div class="field">
+              <label for="nuevoEstado">Nuevo estado</label>
+              <select id="nuevoEstado" [(ngModel)]="nuevoEstado">
+                <option [ngValue]="null">Seleccione un estado…</option>
+                @for (estado of transicionesDisponibles(); track estado) {
+                  <option [ngValue]="estado">{{ estadoLabel[estado] }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="observacion">Observación (opcional)</label>
+              <textarea id="observacion" [(ngModel)]="observacion" placeholder="Comentario para el historial…"></textarea>
+            </div>
+            <div>
+              <button class="btn btn-primary" [disabled]="!nuevoEstado || actualizando()" (click)="confirmarCambioEstado()">
+                @if (actualizando()) {
+                  <app-spinner [inline]="true" etiqueta="Guardando…" />
+                } @else {
+                  Confirmar cambio
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="card">
+        <h2>Historial de estados</h2>
+        @if (detalle.historial.length === 0) {
+          <p class="texto-vacio">Aún no se han registrado cambios de estado.</p>
+        } @else {
+          <ol class="linea-tiempo">
+            @for (evento of detalle.historial; track $index) {
+              <li>
+                <span class="linea-tiempo-punto"></span>
+                <div>
+                  <strong>{{ estadoLabel[evento.estadoAnterior] }} → {{ estadoLabel[evento.estadoNuevo] }}</strong>
+                  <span class="linea-tiempo-fecha">{{ evento.fechaCambio | date: 'd MMM y, h:mm a' }}</span>
+                  @if (evento.observacion) {
+                    <p class="linea-tiempo-obs">{{ evento.observacion }}</p>
+                  }
+                </div>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+
+      <a [routerLink]="esAsesor ? '/solicitudes' : '/portal'" class="btn btn-ghost" style="align-self: flex-start;">‹ Volver</a>
+    </div>
+  }
+</div>
