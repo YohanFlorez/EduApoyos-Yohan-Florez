@@ -1,0 +1,5 @@
+<div class="paginacion">
+  <button class="btn btn-ghost btn-sm" (click)="anterior()" [disabled]="esPrimeraPagina()">‹ Anterior</button>
+  <span>Página {{ paginaActual() }} de {{ totalPaginas() || 1 }}</span>
+  <button class="btn btn-ghost btn-sm" (click)="siguiente()" [disabled]="esUltimaPagina()">Siguiente ›</button>
+</div>
