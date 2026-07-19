@@ -87,7 +87,7 @@ export class DetalleSolicitudComponent {
           this.sweetAlert.exito('Estado actualizado correctamente.');
         },
         error: () => {
-          // El interceptor global ya muestra el detalle del ProblemDetails en un toast.
+          this.sweetAlert.error('No se pudo actualizar el estado.');
         },
       });
   }
