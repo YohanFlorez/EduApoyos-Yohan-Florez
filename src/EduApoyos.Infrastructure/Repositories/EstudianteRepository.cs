@@ -46,10 +46,6 @@ public class EstudianteRepository : IEstudianteRepository
        .Select(e => e.Id)
        .ToListAsync(ct);
 
-        //return await _context.Estudiantes
-        //    .Where(e => e.UsuarioId!.HasValue)
-        //    .Select(e => e.UsuarioId!.Value)
-        //    .ToListAsync(ct);
     }
 
     public async Task<List<Estudiante>> BuscarPorDocumentoAsync(string filtro, CancellationToken ct)

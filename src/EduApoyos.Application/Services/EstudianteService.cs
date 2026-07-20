@@ -24,18 +24,18 @@ public class EstudianteService : IEstudianteService
     public async Task<EstudianteResponse> CrearAsync(CrearEstudianteRequest request, CancellationToken ct = default)
     {
         // UsuarioId es opcional: el asesor puede crear el estudiante sin
-        // vincular todavía una cuenta de acceso (Opción A).
+      
         if (request.UsuarioId.HasValue)
         {
             var usuarioValido = await _usuarioLookup.ExisteUsuarioConRolAsync(
                 request.UsuarioId.Value, RolUsuario.Estudiante, ct);
             if (!usuarioValido)
-                throw new AuthException("El UsuarioId indicado no existe o no tiene rol Estudiante.");
+                throw new ConflictException("El UsuarioId indicado no existe o no tiene rol Estudiante.");
         }
 
         var existente = await _unitOfWork.Estudiantes.ObtenerPorNumeroDocumentoAsync(request.NumeroDocumento, ct);
         if (existente is not null)
-            throw new AuthException("Ya existe un estudiante registrado con ese número de documento.");
+            throw new ConflictException("Ya existe un estudiante registrado con ese número de documento.");
 
         var estudiante = new Estudiante(
             request.NumeroDocumento, request.TipoDocumento,
@@ -73,7 +73,7 @@ public class EstudianteService : IEstudianteService
         TipoDocumento = e.TipoDocumento,
         ProgramaAcademico = e.ProgramaAcademico,
         Semestre = e.Semestre,
-        Activo=e.Activo
+        Activo = e.Activo
     };
 
     public async Task<EstudianteResponse> ObtenerPorUsuarioIdAsync(
@@ -96,6 +96,16 @@ public class EstudianteService : IEstudianteService
     {
         var estudiante = await _unitOfWork.Estudiantes.ObtenerPorIdAsync(id, ct)
             ?? throw new NotFoundException(nameof(Estudiante), id);
+
+       
+        if (!string.Equals(estudiante.NumeroDocumento, request.NumeroDocumento, StringComparison.Ordinal))
+        {
+            var otroConEseDocumento = await _unitOfWork.Estudiantes
+                .ObtenerPorNumeroDocumentoAsync(request.NumeroDocumento, ct);
+
+            if (otroConEseDocumento is not null && otroConEseDocumento.Id != id)
+                throw new ConflictException("Ya existe otro estudiante registrado con ese número de documento.");
+        }
 
         estudiante.ActualizarDatosAcademicos(
             request.TipoDocumento,
@@ -135,8 +145,11 @@ public class EstudianteService : IEstudianteService
         }).ToList();
     }
 
-    
-    public async Task EliminarAsync(Guid id, CancellationToken ct = default)
+
+    /// <summary>
+    /// Desactiva  al estudiante. No elimina el registro físicamente:
+    /// </summary>
+    public async Task DesactivarAsync(Guid id, CancellationToken ct = default)
     {
         var estudiante = await _unitOfWork.Estudiantes.ObtenerPorIdAsync(id, ct)
             ?? throw new NotFoundException(nameof(Estudiante), id);

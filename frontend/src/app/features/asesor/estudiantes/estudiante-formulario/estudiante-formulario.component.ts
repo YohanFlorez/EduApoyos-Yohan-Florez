@@ -53,26 +53,26 @@ export class EstudianteFormularioComponent {
   }
 
   constructor() {
-    // Sincroniza el formulario cada vez que cambia el estudiante a editar
-    effect(() => {
-      const actual = this.estudiante();
-      if (actual) {
-        this.formulario.setValue({
-          usuarioId: actual.usuarioId,
-          numeroDocumento: actual.numeroDocumento,
-          tipoDocumento: actual.tipoDocumento,
-          programaAcademico: actual.programaAcademico,
-          semestre: actual.semestre,
-        });
-        this.formulario.controls.usuarioId.disable();
-        this.nombreSeleccionado.set('');
-      } else {
-        this.formulario.reset({ tipoDocumento: 'CC', semestre: 1 });
-        this.formulario.controls.usuarioId.enable();
-        this.nombreSeleccionado.set('');
-      }
-    });
-  }
+  // Sincroniza el formulario cada vez que cambia el estudiante a editar
+  effect(() => {
+    const actual = this.estudiante();
+    if (actual) {
+      this.formulario.setValue({
+        usuarioId: actual.usuarioId,
+        numeroDocumento: actual.numeroDocumento,
+        tipoDocumento: actual.tipoDocumento,
+        programaAcademico: actual.programaAcademico,
+        semestre: actual.semestre,
+      });
+      this.formulario.controls.usuarioId.disable();
+      this.cargarNombreEstudiante(actual);
+    } else {
+      this.formulario.reset({ tipoDocumento: 'CC', semestre: 1 });
+      this.formulario.controls.usuarioId.enable();
+      this.nombreSeleccionado.set('');
+    }
+  }, { allowSignalWrites: true });
+}
 
   abrirModal(): void {
     this.mostrarModal.set(true);
@@ -132,4 +132,16 @@ export class EstudianteFormularioComponent {
   cancelar(): void {
     this.cancelado.emit();
   }
+
+  private cargarNombreEstudiante(estudiante: Estudiante): void {
+  this.nombreSeleccionado.set('Cargando...');
+  this.estudiantesService.buscarPorDocumento(estudiante.numeroDocumento).subscribe({
+    next: (resultados) => {
+      const encontrado =
+        resultados.find((r) => r.id === estudiante.id) ?? resultados[0] ?? null;
+      this.nombreSeleccionado.set(encontrado?.nombreCompleto ?? '');
+    },
+    error: () => this.nombreSeleccionado.set(''),
+  });
+}
 }

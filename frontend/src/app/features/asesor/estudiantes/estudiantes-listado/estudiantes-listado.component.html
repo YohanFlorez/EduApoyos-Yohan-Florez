@@ -29,6 +29,7 @@
   @if (cargando()) {
     <app-spinner />
   } @else if (!mostrarFormulario()) {
+    <div class="table-scroll">
     <table class="tabla-estudiantes">
       <thead>
         <tr>
@@ -76,6 +77,7 @@
         }
       </tbody>
     </table>
+    </div>
   }
 
 </div>

@@ -23,7 +23,6 @@ public class EstudianteService_CrearAsync_Tests
     {
         _unitOfWorkMock.SetupGet(u => u.Estudiantes)
             .Returns(_estudianteRepoMock.Object);
-
         _sut = new EstudianteService(
             _unitOfWorkMock.Object,
             _usuarioLookupMock.Object);
@@ -34,14 +33,12 @@ public class EstudianteService_CrearAsync_Tests
     {
         // Arrange
         var usuarioId = Guid.NewGuid();
-
         _usuarioLookupMock
             .Setup(l => l.ExisteUsuarioConRolAsync(
                 usuarioId,
                 RolUsuario.Estudiante,
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
-
         _estudianteRepoMock
             .Setup(r => r.ObtenerPorNumeroDocumentoAsync(
                 "100200300",
@@ -62,7 +59,6 @@ public class EstudianteService_CrearAsync_Tests
 
         // Assert
         resultado.NumeroDocumento.Should().Be("100200300");
-
         _estudianteRepoMock.Verify(
             r => r.AgregarAsync(
                 It.IsAny<Estudiante>(),
@@ -70,27 +66,23 @@ public class EstudianteService_CrearAsync_Tests
             Times.Once);
     }
 
-
     [Fact]
     public async Task Crear_estudiante_con_documento_duplicado_lanza_AuthException()
     {
         // Arrange
         var usuarioId = Guid.NewGuid();
-
         _usuarioLookupMock
             .Setup(l => l.ExisteUsuarioConRolAsync(
                 usuarioId,
                 RolUsuario.Estudiante,
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
-
         _estudianteRepoMock
             .Setup(r => r.ObtenerPorNumeroDocumentoAsync(
                 "100200300",
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(
                 new Estudiante(
-                    Guid.NewGuid(),
                     "100200300",
                     "CC",
                     "Otra carrera",
