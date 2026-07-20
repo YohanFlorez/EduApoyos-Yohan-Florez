@@ -1,0 +1,55 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">Portal del estudiante</span>
+      <h1>Mis solicitudes</h1>
+    </div>
+    <a routerLink="/solicitudes/nueva" class="btn btn-primary">+ Nueva solicitud</a>
+  </div>
+
+  @if (cargando()) {
+    <app-spinner etiqueta="Cargando sus solicitudes…" />
+  } @else if (error()) {
+    <div class="card"><p class="auth-error">{{ error() }}</p></div>
+  } @else if (solicitudes().length === 0) {
+    <div class="card table-empty">
+      <p>Aún no ha creado ninguna solicitud.</p>
+      <a routerLink="/solicitudes/nueva" class="btn btn-primary btn-sm">Crear mi primera solicitud</a>
+    </div>
+  } @else {
+    <app-filtros-solicitudes
+      [totalResultados]="solicitudesFiltradas().length"
+      (aplicar)="onAplicarFiltros($event)"
+    />
+
+    @if (solicitudesFiltradas().length === 0) {
+      <div class="card table-empty">
+        <p>No hay solicitudes que coincidan con los filtros seleccionados.</p>
+      </div>
+    } @else {
+      <div class="stack">
+        @for (solicitud of solicitudesFiltradas(); track solicitud.id) {
+          <div class="card solicitud-card">
+            <div class="row-between">
+              <div>
+                <span class="page-eyebrow">{{ tipoLabel[solicitud.tipoApoyo] }}</span>
+                <h3 class="solicitud-card__monto">{{ solicitud.montoSolicitado | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</h3>
+              </div>
+              <app-status-badge [estado]="solicitud.estado" />
+            </div>
+
+            <div class="row-between solicitud-card__pie">
+              <span class="texto-vacio solicitud-card__fecha">
+                Solicitada el {{ solicitud.fechaSolicitud | date: 'd MMM y' }}
+              </span>
+              <div class="row">
+                <button class="btn btn-secondary btn-sm" (click)="descargarConstancia(solicitud)">Descargar constancia</button>
+                <a [routerLink]="['/solicitudes', solicitud.id]" class="btn btn-primary btn-sm">Ver detalle</a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
