@@ -1,0 +1,122 @@
+<div class="page" style="max-width: 640px;">
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">Nueva solicitud</span>
+      <h1>Solicitud de apoyo económico</h1>
+    </div>
+  </div>
+
+  <div class="card">
+    @if (cargandoEstudiante()) {
+      <app-spinner etiqueta="Cargando información…" />
+    } @else {
+      <form [formGroup]="formulario" (ngSubmit)="enviar()" class="stack" novalidate>
+        @if (esAsesor) {
+          <div class="field">
+            <label>Estudiante</label>
+            <div class="campo-con-boton">
+              <input
+                type="text"
+                [value]="estudianteSeleccionadoLabel() || 'Ningún estudiante seleccionado'"
+                [title]="estudianteSeleccionadoLabel() || ''"
+                readonly
+                class="input-solo-lectura"
+                [class.invalid]="f.estudianteIdManual.invalid && f.estudianteIdManual.touched"
+              />
+              <button type="button" class="btn btn-secondary" (click)="abrirModal()">Consultar</button>
+            </div>
+            @if (f.estudianteIdManual.invalid && f.estudianteIdManual.touched) {
+              <span class="field-error">Debe seleccionar un estudiante.</span>
+            }
+          </div>
+        }
+
+        <div class="field">
+          <label for="tipoApoyo">Tipo de apoyo</label>
+          <select id="tipoApoyo" formControlName="tipoApoyo">
+            @for (tipo of tipos; track tipo) {
+              <option [ngValue]="tipo">{{ tipoLabel[tipo] }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="montoSolicitado">Monto solicitado (COP)</label>
+          <input
+            id="montoSolicitado"
+            type="number"
+            min="1"
+            formControlName="montoSolicitado"
+            [class.invalid]="f.montoSolicitado.invalid && f.montoSolicitado.touched"
+            placeholder="1500000"
+          />
+          @if (f.montoSolicitado.invalid && f.montoSolicitado.touched) {
+            <span class="field-error">Ingrese un monto mayor a cero.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            formControlName="descripcion"
+            [class.invalid]="f.descripcion.invalid && f.descripcion.touched"
+            placeholder="Describa brevemente el motivo de su solicitud (mínimo 20 caracteres)."
+          ></textarea>
+          @if (f.descripcion.invalid && f.descripcion.touched) {
+            <span class="field-error">La descripción debe tener entre 20 y 1000 caracteres.</span>
+          }
+        </div>
+
+        @if (errorGeneral()) {
+          <p class="auth-error">{{ errorGeneral() }}</p>
+        }
+
+        <div class="row">
+          <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+            @if (enviando()) {
+              <app-spinner [inline]="true" etiqueta="Enviando…" />
+            } @else {
+              Enviar solicitud
+            }
+          </button>
+          <a [routerLink]="esAsesor ? '/solicitudes' : '/portal'" class="btn btn-ghost">Cancelar</a>
+        </div>
+      </form>
+    }
+  </div>
+
+  @if (mostrarModal()) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-contenido" (click)="$event.stopPropagation()">
+        <h3>Buscar estudiante</h3>
+        <input
+          type="text"
+          [formControl]="busquedaControl"
+          placeholder="Buscar por número de documento..."
+          autofocus
+        />
+
+        @if (buscando()) {
+          <p class="modal-info">Buscando...</p>
+        } @else if (busquedaControl.value.trim().length === 0) {
+          <p class="modal-info">Escriba un número de documento para buscar.</p>
+        } @else if (resultadosBusqueda().length === 0) {
+          <p class="modal-info">No se encontraron estudiantes con ese documento.</p>
+        } @else {
+          <ul class="lista-resultados">
+            @for (e of resultadosBusqueda(); track e.id) {
+              <li (click)="seleccionarEstudiante(e)">
+                <strong>{{ e.nombreCompleto || '' }}</strong>
+                <strong>{{ e.tipoDocumento }} {{ e.numeroDocumento }}</strong>
+                <span>{{ e.programaAcademico }}</span>
+              </li>
+            }
+          </ul>
+        }
+
+        <button type="button" class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  }
+</div>
