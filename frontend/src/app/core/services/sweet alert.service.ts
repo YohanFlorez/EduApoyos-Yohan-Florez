@@ -1,19 +1,14 @@
 import { Injectable } from '@angular/core';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
-/**
- * Servicio centralizado para mostrar alertas y confirmaciones con SweetAlert2.
- * Úsalo en cualquier componente inyectándolo con `inject(SweetAlertService)`.
- */
+
+ // Servicio centralizado para mostrar alertas y confirmaciones con SweetAlert2.
+
 @Injectable({ providedIn: 'root' })
 export class SweetAlertService {
 
-  /**
-   * Confirmación genérica (Sí/No). Devuelve una Promise<boolean>.
-   * Ejemplo:
-   *   const ok = await this.sweetAlert.confirmar('¿Eliminar estudiante?', 'Esta acción no se puede deshacer.');
-   *   if (!ok) return;
-   */
+  //Confirmación genérica (Sí/No). Devuelve una Promise<boolean>.
+
   async confirmar(
     titulo: string,
     texto = '',
@@ -32,7 +27,7 @@ export class SweetAlertService {
     return resultado.isConfirmed;
   }
 
-  /** Confirmación específica para eliminar (icono y textos ya orientados a esa acción). */
+
   async confirmarEliminacion(entidad: string): Promise<boolean> {
     return this.confirmar(
       `¿Eliminar ${entidad}?`,
@@ -41,7 +36,15 @@ export class SweetAlertService {
     );
   }
 
-  /** Notificación de éxito (auto-cierra). */
+   async confirmarDesactivacion(entidad: string): Promise<boolean> {
+    return this.confirmar(
+      `¿Eliminar ${entidad}?`,
+      'Esta acción no se puede deshacer.',
+      { icono: 'warning', confirmText: 'Sí, eliminar', cancelText: 'Cancelar' }
+    );
+  }
+
+
   exito(mensaje: string, titulo = 'Listo'): void {
     Swal.fire({
       title: titulo,

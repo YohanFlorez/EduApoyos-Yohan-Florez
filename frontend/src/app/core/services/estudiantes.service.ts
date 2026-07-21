@@ -50,7 +50,7 @@ export class EstudiantesService {
     return this.http.put<Estudiante>(`${this.baseUrl}/${id}`, data);
   }
 
-  eliminar(id: string) {
+  desactivar(id: string) {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
