@@ -1,0 +1,100 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-contenido {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 420px;
+  padding: 1.5rem;
+
+  h3 {
+    margin: 0 0 1rem;
+    font-size: 1.05rem;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    margin-bottom: 0.75rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+}
+
+.modal-info {
+  font-size: 0.85rem;
+  color: #64748b;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.lista-resultados {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.65rem 0.85rem;
+    cursor: pointer;
+    border-bottom: 1px solid #e2e8f0;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: #f8fafc; }
+
+    strong { font-size: 0.88rem; }
+    span { font-size: 0.78rem; color: #64748b; }
+  }
+}
+
+.btn-cancelar {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+}
+.lista-resultados li {
+  strong {
+    font-size: 0.92rem;
+    color: #1e293b;
+  }
+  span {
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+}
+.campo-con-boton {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.campo-con-boton .input-solo-lectura {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campo-con-boton .btn-secondary {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}

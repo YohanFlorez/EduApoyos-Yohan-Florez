@@ -1,0 +1,40 @@
+<div class="card card--filtros">
+  <div class="form-grid form-grid--filtros" [formGroup]="formulario">
+    <div class="field">
+      <label for="f-estado">Estado</label>
+      <select id="f-estado" formControlName="estado">
+        <option [ngValue]="null">Todos</option>
+        @for (estado of estados; track estado) {
+          <option [ngValue]="estado">{{ estadoLabel[estado] }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="f-tipo">Tipo de apoyo</label>
+      <select id="f-tipo" formControlName="tipoApoyo">
+        <option [ngValue]="null">Todos</option>
+        @for (tipo of tipos; track tipo) {
+          <option [ngValue]="tipo">{{ tipoLabel[tipo] }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="f-desde">Desde</label>
+      <input id="f-desde" type="date" formControlName="fechaDesde" />
+    </div>
+
+    <div class="field">
+      <label for="f-hasta">Hasta</label>
+      <input id="f-hasta" type="date" formControlName="fechaHasta" />
+    </div>
+  </div>
+
+  <div class="row acciones-filtro">
+    <button type="button" class="btn btn-primary btn-sm" (click)="filtrar()">Filtrar</button>
+    <button type="button" class="btn btn-ghost btn-sm" (click)="limpiar()">Limpiar</button>
+    <span class="spacer"></span>
+    <span class="chip-filtro texto-vacio">{{ totalResultados() }} resultado(s)</span>
+  </div>
+</div>

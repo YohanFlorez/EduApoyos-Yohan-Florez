@@ -1,0 +1,40 @@
+// filtros-solicitudes.component.scss
+// Reemplaza los estilos que antes estaban en línea (style="...") en el HTML.
+
+.card--filtros {
+  margin-bottom: 20px;
+}
+
+.form-grid--filtros {
+  grid-template-columns: repeat(4, 1fr);
+  align-items: end;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.acciones-filtro {
+  margin-top: 16px;
+  flex-wrap: wrap;
+
+  @media (max-width: 520px) {
+    .btn {
+      flex: 1;
+    }
+
+    .spacer {
+      display: none;
+    }
+
+    .chip-filtro {
+      width: 100%;
+      text-align: center;
+      order: 3;
+    }
+  }
+}
