@@ -1,0 +1,51 @@
+<div class="shell">
+  <header class="shell-header">
+    <div class="shell-header-inner">
+      <div class="marca">
+        <span class="marca-sello">EA</span>
+        <div>
+          <strong>EduApoyos</strong>
+          <span class="marca-sub">Apoyos económicos</span>
+        </div>
+      </div>
+
+      @if (auth.estaAutenticado()) {
+        <button
+          type="button"
+          class="shell-toggle"
+          [class.abierto]="menuAbierto()"
+          [attr.aria-expanded]="menuAbierto()"
+          aria-label="Abrir menú"
+          (click)="toggleMenu()"
+        >
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="shell-panel" [class.abierto]="menuAbierto()">
+          <nav class="shell-nav">
+            @if (esAsesor()) {
+              <a routerLink="/solicitudes" routerLinkActive="activo" (click)="cerrarMenu()">Solicitudes</a>
+              <a routerLink="/estudiantes" routerLinkActive="activo" (click)="cerrarMenu()">Estudiantes</a>
+            } @else {
+              <a routerLink="/portal" routerLinkActive="activo" (click)="cerrarMenu()">Mi portal</a>
+              <a routerLink="/solicitudes/nueva" routerLinkActive="activo" (click)="cerrarMenu()">Nueva solicitud</a>
+            }
+          </nav>
+
+          <div class="shell-usuario">
+            <a routerLink="/perfil" class="shell-usuario-info shell-usuario-link" (click)="cerrarMenu()">
+              <strong>{{ auth.usuarioActual()?.nombreCompleto }}</strong>
+              <span>{{ esAsesor() ? 'Asesor' : 'Estudiante' }}</span>
+            </a>
+            <button class="btn btn-ghost btn-sm" (click)="salir()">Salir</button>
+          </div>
+        </div>
+      }
+    </div>
+  </header>
+
+  <main>
+    <router-outlet />
+  </main>
+</div>
+<app-toast-host />

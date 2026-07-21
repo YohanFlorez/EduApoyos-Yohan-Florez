@@ -63,9 +63,9 @@
                   type="button"
                   class="link-accion link-peligro"
                   [disabled]="eliminando() === estudiante.id"
-                  (click)="eliminar(estudiante)"
+                  (click)="desactivar(estudiante)"
                 >
-                  {{ eliminando() === estudiante.id ? 'Eliminando...' : 'Eliminar' }}
+                  {{ eliminando() === estudiante.id ? 'Desactivando...' : 'Desactivar' }}
                 </button>
               }
             </td>

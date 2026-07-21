@@ -87,8 +87,8 @@ export class EstudiantesListadoComponent {
     this.cargar();
   }
 
-  async eliminar(estudiante: Estudiante): Promise<void> {
-    const confirmado = await this.sweetAlert.confirmarEliminacion(
+  async desactivar(estudiante: Estudiante): Promise<void> {
+    const confirmado = await this.sweetAlert.confirmarDesactivacion(
       `al estudiante ${estudiante.tipoDocumento} ${estudiante.numeroDocumento}`
     );
     if (!confirmado) {
@@ -97,15 +97,15 @@ export class EstudiantesListadoComponent {
 
     this.eliminando.set(estudiante.id);
     this.estudiantesService
-      .eliminar(estudiante.id)
+      .desactivar(estudiante.id)
       .pipe(finalize(() => this.eliminando.set(null)))
       .subscribe({
         next: () => {
-          this.sweetAlert.exito('Estudiante eliminado correctamente.');
+          this.sweetAlert.exito('Estudiante desactivado correctamente.');
           this.cargar();
         },
         error: () => {
-          this.sweetAlert.error('No se pudo eliminar el estudiante.');
+          this.sweetAlert.error('No se pudo desactivado el estudiante.');
         },
       });
   }
