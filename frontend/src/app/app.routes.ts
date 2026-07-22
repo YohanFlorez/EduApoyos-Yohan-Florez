@@ -1,15 +1,19 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { noAuthGuard } from './core/guards/no-auth.guard';
 import { RolUsuario } from './core/models';
+import { APP_ROUTES } from './core/config/app-routes.config';
 
 export const routes: Routes = [
   {
     path: 'login',
+    canActivate: [noAuthGuard],
     loadComponent: () => import('./features/auth/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'registro',
+    canActivate: [noAuthGuard],
     loadComponent: () => import('./features/auth/registro/registro.component').then((m) => m.RegistroComponent),
   },
 
@@ -66,10 +70,10 @@ export const routes: Routes = [
   },
   {
     path: 'perfil',
-    loadComponent: () => import('./features/perfil/perfil.component').then(m => m.PerfilComponent),
-    canActivate: [authGuard], // el guard que ya uses para rutas autenticadas
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/perfil/perfil.component').then((m) => m.PerfilComponent),
   },
 
-  { path: '', pathMatch: 'full', redirectTo: 'login' },
-  { path: '**', redirectTo: 'login' },
+  { path: '', pathMatch: 'full', redirectTo: APP_ROUTES.LOGIN },
+  { path: '**', redirectTo: APP_ROUTES.LOGIN },
 ];
