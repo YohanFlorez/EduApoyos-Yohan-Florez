@@ -54,6 +54,10 @@ export class EstudiantesService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
+  activar(id: string) {
+  return this.http.patch<void>(`${this.baseUrl}/${id}/activar`, {});
+  }
+
   buscarPorDocumento(filtro: string) {
   return this.http.get<EstudianteBusqueda[]>(`${this.baseUrl}/buscar`, {
     params: { filtro },

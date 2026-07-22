@@ -24,13 +24,17 @@ public class EstudianteService : IEstudianteService
     public async Task<EstudianteResponse> CrearAsync(CrearEstudianteRequest request, CancellationToken ct = default)
     {
         // UsuarioId es opcional: el asesor puede crear el estudiante sin
-      
         if (request.UsuarioId.HasValue)
         {
             var usuarioValido = await _usuarioLookup.ExisteUsuarioConRolAsync(
                 request.UsuarioId.Value, RolUsuario.Estudiante, ct);
             if (!usuarioValido)
                 throw new ConflictException("El UsuarioId indicado no existe o no tiene rol Estudiante.");
+
+            var estudianteConMismoUsuario = await _unitOfWork.Estudiantes.ObtenerPorUsuarioIdAsync(
+                request.UsuarioId.Value, ct);
+            if (estudianteConMismoUsuario is not null)
+                throw new ConflictException("Ese usuario ya tiene un estudiante registrado.");
         }
 
         var existente = await _unitOfWork.Estudiantes.ObtenerPorNumeroDocumentoAsync(request.NumeroDocumento, ct);
@@ -45,7 +49,6 @@ public class EstudianteService : IEstudianteService
         await _unitOfWork.GuardarCambiosAsync(ct);
         return Mapear(estudiante);
     }
-
     public async Task<EstudianteResponse> ObtenerPorIdAsync(Guid id, CancellationToken ct = default)
     {
         var estudiante = await _unitOfWork.Estudiantes.ObtenerPorIdAsync(id, ct)
@@ -162,6 +165,19 @@ public class EstudianteService : IEstudianteService
                 $"El estudiante '{id}' tiene solicitudes activas y no puede eliminarse.");
 
         estudiante.Desactivar();
+
+        await _unitOfWork.GuardarCambiosAsync(ct);
+    }
+
+    /// <summary>
+    /// Reactiva a un estudiante previamente desactivado.
+    /// </summary>
+    public async Task ActivarAsync(Guid id, CancellationToken ct = default)
+    {
+        var estudiante = await _unitOfWork.Estudiantes.ObtenerPorIdAsync(id, ct)
+            ?? throw new NotFoundException(nameof(Estudiante), id);
+
+        estudiante.Activar();
 
         await _unitOfWork.GuardarCambiosAsync(ct);
     }

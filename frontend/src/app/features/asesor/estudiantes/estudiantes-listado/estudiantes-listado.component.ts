@@ -109,4 +109,29 @@ export class EstudiantesListadoComponent {
         },
       });
   }
+
+  async activar(estudiante: Estudiante): Promise<void> {
+  const confirmado = await this.sweetAlert.confirmar(
+    '¿Activar estudiante?',
+    `Se reactivará al estudiante ${estudiante.tipoDocumento} ${estudiante.numeroDocumento}.`,
+    { icono: 'question', confirmText: 'Sí, activar' }
+  );
+  if (!confirmado) {
+    return;
+  }
+
+  this.eliminando.set(estudiante.id);
+  this.estudiantesService
+    .activar(estudiante.id)
+    .pipe(finalize(() => this.eliminando.set(null)))
+    .subscribe({
+      next: () => {
+        this.sweetAlert.exito('Estudiante activado correctamente.');
+        this.cargar();
+      },
+      error: () => {
+        this.sweetAlert.error('No se pudo activar el estudiante.');
+      },
+    });
+}
 }

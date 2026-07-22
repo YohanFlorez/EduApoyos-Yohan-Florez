@@ -25,6 +25,8 @@ namespace EduApoyos.Application.Interfaces
 
         Task DesactivarAsync(Guid id, CancellationToken ct);
 
+        Task ActivarAsync(Guid id, CancellationToken ct = default);
+
     }
 }
 

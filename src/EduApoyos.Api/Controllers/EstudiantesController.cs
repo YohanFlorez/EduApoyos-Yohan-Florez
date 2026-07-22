@@ -173,5 +173,18 @@ public class EstudiantesController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Reactiva a un estudiante previamente desactivado, cambia el campo activo a 1
+    /// </summary>
+    [HttpPatch("{id:guid}/activar")]
+    [Authorize(Roles = "Asesor")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ActivarAsync(Guid id, CancellationToken ct)
+    {
+        await _estudianteService.ActivarAsync(id, ct);
+        return NoContent();
+    }
+
 
 }

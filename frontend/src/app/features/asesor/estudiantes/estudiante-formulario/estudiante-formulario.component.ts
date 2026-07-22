@@ -14,7 +14,7 @@ import { EstudiantesService } from '../../../../core/services/estudiantes.servic
 import { SweetAlertService } from '../../../../core/services/sweet alert.service';
 import { Estudiante, UsuarioPendiente } from '../../../../core/models/estudiante.models';
 import { BuscarUsuarioModalComponent } from '../buscar-usuario-modal/buscar-usuario-modal.component';
-
+import { ProblemDetails } from '../../../../core/models'; // ajusta la ruta según tu proyecto
 
 @Component({
   selector: 'app-estudiante-formulario',
@@ -41,7 +41,7 @@ export class EstudianteFormularioComponent {
   readonly nombreSeleccionado = signal<string>('');
 
   readonly formulario = this.fb.nonNullable.group({
-    usuarioId: ['', [Validators.required]],
+    usuarioId: [''],
     numeroDocumento: ['', [Validators.required]],
     tipoDocumento: ['CC', [Validators.required]],
     programaAcademico: ['', [Validators.required]],
@@ -58,7 +58,7 @@ export class EstudianteFormularioComponent {
     const actual = this.estudiante();
     if (actual) {
       this.formulario.setValue({
-        usuarioId: actual.usuarioId,
+        usuarioId: actual.usuarioId ?? '',
         numeroDocumento: actual.numeroDocumento,
         tipoDocumento: actual.tipoDocumento,
         programaAcademico: actual.programaAcademico,
@@ -88,46 +88,54 @@ export class EstudianteFormularioComponent {
     this.mostrarModal.set(false);
   }
 
-  async guardar(): Promise<void> {
-    if (this.formulario.invalid) {
-      this.formulario.markAllAsTouched();
-      return;
-    }
-
-    const enEdicion = this.estudiante();
-
-    if (enEdicion) {
-      const confirmado = await this.sweetAlert.confirmar(
-        '¿Actualizar estudiante?',
-        'Se guardarán los cambios realizados.',
-        { icono: 'question', confirmText: 'Sí, actualizar' }
-      );
-      if (!confirmado) {
-        return;
-      }
-    }
-
-    this.guardando.set(true);
-    const valores = this.formulario.getRawValue();
-
-    const peticion = enEdicion
-      ? this.estudiantesService.actualizar(enEdicion.id, valores)
-      : this.estudiantesService.crear(valores);
-
-    peticion.pipe(finalize(() => this.guardando.set(false))).subscribe({
-      next: () => {
-        this.sweetAlert.exito(
-          enEdicion ? 'Estudiante actualizado correctamente.' : 'Estudiante creado correctamente.'
-        );
-        this.guardado.emit();
-      },
-      error: () => {
-        this.sweetAlert.error(
-          enEdicion ? 'No se pudo actualizar el estudiante.' : 'No se pudo crear el estudiante.'
-        );
-      },
-    });
+async guardar(): Promise<void> {
+  if (this.formulario.invalid) {
+    this.formulario.markAllAsTouched();
+    return;
   }
+
+  const enEdicion = this.estudiante();
+
+  const confirmado = await this.sweetAlert.confirmar(
+    enEdicion ? '¿Actualizar estudiante?' : '¿Crear estudiante?',
+    enEdicion
+      ? 'Se guardarán los cambios realizados.'
+      : 'Se registrará un nuevo estudiante con los datos ingresados.',
+    { icono: 'question', confirmText: enEdicion ? 'Sí, actualizar' : 'Sí, crear' }
+  );
+  if (!confirmado) {
+    return;
+  }
+
+  this.guardando.set(true);
+  const valores = this.formulario.getRawValue();
+
+  const payload = {
+    ...valores,
+    usuarioId: valores.usuarioId ? valores.usuarioId : null,   // 👈 clave
+  };
+
+  const peticion = enEdicion
+    ? this.estudiantesService.actualizar(enEdicion.id, payload)   // 👈 usa payload, no valores
+    : this.estudiantesService.crear(payload);                     // 👈 usa payload, no valores
+
+  peticion.pipe(finalize(() => this.guardando.set(false))).subscribe({
+    next: () => {
+      this.sweetAlert.exito(
+        enEdicion ? 'Estudiante actualizado correctamente.' : 'Estudiante creado correctamente.'
+      );
+      this.guardado.emit();
+    },
+    error: (error) => {
+      const problema = error?.error as ProblemDetails | undefined;
+      const mensaje =
+        problema?.detail ||
+        problema?.title ||
+        (enEdicion ? 'No se pudo actualizar el estudiante.' : 'No se pudo crear el estudiante.');
+      this.sweetAlert.error(mensaje);
+    },
+  });
+}
 
   cancelar(): void {
     this.cancelado.emit();

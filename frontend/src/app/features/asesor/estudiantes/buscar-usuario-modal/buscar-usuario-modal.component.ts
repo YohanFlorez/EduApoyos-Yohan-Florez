@@ -41,14 +41,14 @@ export class BuscarUsuarioModalComponent {
         this.busquedaControl.setValue('', { emitEvent: false });
         this.buscar('');
       }
-    });
+    },  { allowSignalWrites: true } );
 
 
     this.busquedaControl.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged(),
-        takeUntilDestroyed(this.destroyRef) // evita fugas si el componente se destruye
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((texto) => this.buscar(texto));
   }

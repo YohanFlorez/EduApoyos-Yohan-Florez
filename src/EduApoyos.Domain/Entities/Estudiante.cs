@@ -103,6 +103,14 @@ public class Estudiante
         FechaEliminacion = DateTime.UtcNow;
     }
 
+    public void Activar()
+    {
+        if (Activo)
+            throw new Domain.Common.DomainException("El estudiante ya se encuentra activo.");
+        Activo = true;
+        FechaEliminacion = null;
+    }
+
     /// <summary>
     /// Reactiva a un estudiante previamente desactivado.
     /// </summary>
