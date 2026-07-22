@@ -16,12 +16,16 @@ public class SolicitudService_CambiarEstadoAsync_Tests
 {
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<ISolicitudRepository> _solicitudRepoMock = new();
+    private readonly Mock<IHistorialEstadoRepository> _historialRepoMock = new();
     private readonly SolicitudService _sut;
 
     public SolicitudService_CambiarEstadoAsync_Tests()
     {
         _unitOfWorkMock.SetupGet(u => u.Solicitudes)
             .Returns(_solicitudRepoMock.Object);
+
+        _unitOfWorkMock.SetupGet(u => u.HistorialEstado)
+            .Returns(_historialRepoMock.Object);
 
         _sut = new SolicitudService(
             _unitOfWorkMock.Object,

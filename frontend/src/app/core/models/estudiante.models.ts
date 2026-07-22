@@ -1,6 +1,6 @@
 export interface Estudiante {
   id: string;
-  usuarioId: string;
+  usuarioId: string | null;
   numeroDocumento: string;
   tipoDocumento: string;
   programaAcademico: string;
@@ -9,7 +9,7 @@ export interface Estudiante {
 }
 
 export interface CrearEstudianteRequest {
-  usuarioId: string;
+  usuarioId: string | null;
   numeroDocumento: string;
   tipoDocumento: string;
   programaAcademico: string;

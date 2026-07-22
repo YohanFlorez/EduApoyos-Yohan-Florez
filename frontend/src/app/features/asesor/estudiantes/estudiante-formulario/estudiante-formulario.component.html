@@ -8,7 +8,7 @@
 
   @if (!editando()) {
     <p class="ayuda">
-      El usuario (correo/contraseña) debe existir previamente — normalmente se crea vía
+      Si el usuario (correo/contraseña)  existe previamente — normalmente se crea vía
       "Registro" con rol Estudiante. Use el botón "Consultar" para seleccionarlo.
     </p>
   }
@@ -23,15 +23,15 @@
         <div class="campo-con-boton">
           <input
             type="text"
-            [value]="nombreSeleccionado() || 'Ningún estudiante seleccionado'"
+            [value]="nombreSeleccionado() || 'Ningún usuario seleccionado'"
             readonly
             class="input-solo-lectura"
           >
           <button type="button" class="btn-outline" (click)="abrirModal()">Consultar</button>
         </div>
-        @if (f.usuarioId.invalid && f.usuarioId.touched) {
+        <!-- @if (f.usuarioId.invalid && f.usuarioId.touched) {
           <small class="error">Debe seleccionar un estudiante.</small>
-        }
+        } -->
       }
     </div>
 

@@ -67,6 +67,15 @@
                 >
                   {{ eliminando() === estudiante.id ? 'Desactivando...' : 'Desactivar' }}
                 </button>
+              } @else {
+                <button
+                  type="button"
+                  class="link-accion link-exito"
+                  [disabled]="eliminando() === estudiante.id"
+                  (click)="activar(estudiante)"
+                >
+                  {{ eliminando() === estudiante.id ? 'Activando...' : 'Activar' }}
+                </button>
               }
             </td>
           </tr>
