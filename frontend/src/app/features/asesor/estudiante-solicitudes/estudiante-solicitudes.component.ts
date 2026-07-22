@@ -29,7 +29,6 @@ export class EstudianteSolicitudesComponent {
     .listarSolicitudes(estudianteId, 1, 50)
     .pipe(finalize(() => this.cargando.set(false)))
     .subscribe((resultado) => {
-      console.log('Solicitudes recibidas:', resultado.items); // 👈 agrega esto
       this.solicitudes.set(resultado.items);
     });
 }

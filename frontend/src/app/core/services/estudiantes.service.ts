@@ -19,7 +19,7 @@ export class EstudiantesService {
   }
 
   obtenerPropio(): Observable<Estudiante> {
-    console.log('Ejecutando obtenerPropio');
+
     return this.http.get<Estudiante>(`${this.baseUrl}/me`);
   }
 
@@ -37,12 +37,10 @@ export class EstudiantesService {
   }
 
   listarPendientes(busqueda?: string): Observable<UsuarioPendiente[]> {
-    console.log("busqueda",busqueda);
   let params = new HttpParams();
   if (busqueda)
   {
     params = params.set('filtro', busqueda);
-     console.log("params",params);
   }
     return this.http.get<UsuarioPendiente[]>(`${this.baseUrl}/pendientes`, { params });
   }
