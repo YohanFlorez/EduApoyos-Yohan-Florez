@@ -5,6 +5,8 @@ public interface IUnitOfWork
 {
     IEstudianteRepository Estudiantes { get; }
     ISolicitudRepository Solicitudes { get; }
+
+    IHistorialEstadoRepository HistorialEstado { get; }
     Task<int> GuardarCambiosAsync(CancellationToken ct = default);
 
     

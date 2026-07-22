@@ -27,6 +27,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo

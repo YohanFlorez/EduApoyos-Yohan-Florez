@@ -53,4 +53,6 @@ public class SolicitudRepository : ISolicitudRepository
         return await _context.Solicitudes
             .AnyAsync(s => s.EstudianteId == estudianteId && estadosActivos.Contains(s.Estado), ct);
     }
+
+
 }
