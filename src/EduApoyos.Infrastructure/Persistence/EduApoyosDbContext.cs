@@ -15,6 +15,7 @@ public class EduApoyosDbContext : IdentityDbContext<ApplicationUser, IdentityRol
     public DbSet<Estudiante> Estudiantes => Set<Estudiante>();
     public DbSet<SolicitudApoyo> Solicitudes => Set<SolicitudApoyo>();
     public DbSet<HistorialEstado> HistorialEstados => Set<HistorialEstado>();
+   
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
