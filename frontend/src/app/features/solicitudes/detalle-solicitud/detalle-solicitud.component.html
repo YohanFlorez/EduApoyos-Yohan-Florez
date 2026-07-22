@@ -3,8 +3,8 @@
     <app-spinner etiqueta="Cargando solicitud…" />
   } @else if (solicitud()) {
     @let detalle = solicitud()!;
-    <div class="page-header">
-      <div>
+    <div class="header-marca">
+  <div class="page-header">
         <span class="page-eyebrow">Expediente {{ detalle.id.slice(0, 8) }}</span>
         <h1>{{ tipoLabel[detalle.tipoApoyo] }} — {{ detalle.montoSolicitado | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</h1>
       </div>

@@ -55,3 +55,22 @@
   border-radius: var(--radius-sm);
   padding: 8px 10px;
 }
+.header-marca {
+  background-color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.header-marca .page-eyebrow {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.header-marca h1 {
+  color: #ffffff;
+  margin: 4px 0 0;
+}
+
+.header-marca .page-header {
+  margin: 0;
+}

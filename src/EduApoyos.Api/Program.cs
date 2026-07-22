@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("FrontendPolicy", policy =>
     {
         var origenesPermitidos = builder.Configuration.GetSection("Cors:OrigenesPermitidos").Get<string[]>()
-            ?? new[] { "http://localhost:5173", "http://localhost:3000", "http://localhost:57079" };
+            ?? new[] { "http://localhost:5173", "http://localhost:3000", "http://localhost:50101" };
 
         policy.WithOrigins(origenesPermitidos)
             .AllowAnyHeader()
@@ -64,9 +64,11 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-//  Migraciones y seed al arrancar (solo simplifica la evaluación local) 
-await DbInitializer.InicializarAsync(app.Services);
-
+//  migraciones y seed al arrancar 
+if (Environment.GetEnvironmentVariable("SKIP_DB_MIGRATE") != "true")
+{
+    await DbInitializer.InicializarAsync(app.Services);
+}
 //  Middleware pipeline
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
