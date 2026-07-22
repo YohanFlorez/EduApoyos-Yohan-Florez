@@ -67,7 +67,7 @@ public class EstudianteService_CrearAsync_Tests
     }
 
     [Fact]
-    public async Task Crear_estudiante_con_documento_duplicado_lanza_AuthException()
+    public async Task Crear_estudiante_con_documento_duplicado_lanza_ConflictException()
     {
         // Arrange
         var usuarioId = Guid.NewGuid();
@@ -101,7 +101,6 @@ public class EstudianteService_CrearAsync_Tests
         var accion = async () => await _sut.CrearAsync(request);
 
         // Assert
-        await accion.Should()
-            .ThrowAsync<AuthException>();
+        await accion.Should().ThrowAsync<ConflictException>();
     }
 }
