@@ -77,20 +77,35 @@ public class SolicitudService : ISolicitudService
         return MapearDetalle(solicitud);
     }
 
+
     public async Task<SolicitudDetalleResponse> CambiarEstadoAsync(Guid id, CambiarEstadoRequest request, Guid asesorId, CancellationToken ct = default)
     {
         var solicitud = await _unitOfWork.Solicitudes.ObtenerPorIdConHistorialAsync(id, ct)
             ?? throw new NotFoundException(nameof(SolicitudApoyo), id);
 
-        // La entidad valida la transición usando la estrategia (patrón Strategy) y genera el HistorialEstado.
-        // Si la transición es inválida, SolicitudApoyo.CambiarEstado lanzará la excepción correspondiente,
-        // que sube sin capturarse aquí para que el ExceptionHandlingMiddleware la traduzca al código HTTP correcto.
         solicitud.CambiarEstado(request.NuevoEstado, asesorId, _estadoStrategy, request.Observacion, asesorId);
+
+        var nuevoRegistro = solicitud.Historial.Last();
+        await _unitOfWork.HistorialEstado.AgregarHistorialAsync(nuevoRegistro, ct);
 
         await _unitOfWork.GuardarCambiosAsync(ct);
 
         return MapearDetalle(solicitud);
     }
+    //public async Task<SolicitudDetalleResponse> CambiarEstadoAsync(Guid id, CambiarEstadoRequest request, Guid asesorId, CancellationToken ct = default)
+    //{
+    //    var solicitud = await _unitOfWork.Solicitudes.ObtenerPorIdConHistorialAsync(id, ct)
+    //        ?? throw new NotFoundException(nameof(SolicitudApoyo), id);
+
+    //    // La entidad valida la transición usando la estrategia (patrón Strategy) y genera el HistorialEstado.
+    //    // Si la transición es inválida, SolicitudApoyo.CambiarEstado lanzará la excepción correspondiente,
+    //    // que sube sin capturarse aquí para que el ExceptionHandlingMiddleware la traduzca al código HTTP correcto.
+    //    solicitud.CambiarEstado(request.NuevoEstado, asesorId, _estadoStrategy, request.Observacion, asesorId);
+
+    //    await _unitOfWork.GuardarCambiosAsync(ct);
+
+    //    return MapearDetalle(solicitud);
+    //}
 
     public async Task<PagedResponse<SolicitudListItemResponse>> ListarPorEstudianteAsync(
         Guid estudianteId, Guid usuarioActualId, RolUsuario rolActual, int pageNumber, int pageSize, CancellationToken ct = default)

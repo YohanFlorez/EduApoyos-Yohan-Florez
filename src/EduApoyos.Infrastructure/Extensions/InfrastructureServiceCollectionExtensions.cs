@@ -6,11 +6,13 @@ using EduApoyos.Infrastructure.Identity;
 using EduApoyos.Infrastructure.Persistence;
 using EduApoyos.Infrastructure.Repositories;
 using EduApoyos.Infrastructure.Services;
+using EduApoyos.Infrastructure.Services.PostRegistro;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace EduApoyos.Infrastructure.Extensions;
@@ -18,9 +20,9 @@ namespace EduApoyos.Infrastructure.Extensions;
 public static class InfrastructureServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
-    {
+    {       
         services.AddDbContext<EduApoyosDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
@@ -40,6 +42,9 @@ public static class InfrastructureServiceCollectionExtensions
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
+
+
+
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -54,6 +59,14 @@ public static class InfrastructureServiceCollectionExtensions
                     ClockSkew = TimeSpan.FromSeconds(30)
                 };
             });
+
+
+        ///OJO
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("MismoEstudianteOAsesor", policy =>
+                policy.RequireRole("Asesor", "Estudiante"));
+        });
 
         services.AddHttpContextAccessor();
 
@@ -70,7 +83,8 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUsuarioLookupService, UsuarioLookupService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-
+        services.AddScoped<IPostRegistroHandler, EstudiantePostRegistroHandler>();
+        services.AddScoped<IHistorialEstadoRepository, HistorialEstadoRepository>();
         return services;
     }
 }

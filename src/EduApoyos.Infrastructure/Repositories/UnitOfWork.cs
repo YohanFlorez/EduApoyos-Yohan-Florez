@@ -12,11 +12,14 @@ public class UnitOfWork : IUnitOfWork
     public IEstudianteRepository Estudiantes { get; }
     public ISolicitudRepository Solicitudes { get; }
 
-    public UnitOfWork(EduApoyosDbContext context, IEstudianteRepository estudiantes, ISolicitudRepository solicitudes)
+    public IHistorialEstadoRepository HistorialEstado { get; }
+
+    public UnitOfWork(EduApoyosDbContext context, IEstudianteRepository estudiantes, ISolicitudRepository solicitudes, IHistorialEstadoRepository historialEstado)
     {
         _context = context;
         Estudiantes = estudiantes;
         Solicitudes = solicitudes;
+        HistorialEstado = historialEstado;
     }
 
     public Task<int> GuardarCambiosAsync(CancellationToken ct = default) => _context.SaveChangesAsync(ct);
